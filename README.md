@@ -1,3 +1,7 @@
+<<<<<<< ours
 # game-project
 
-sadgjbgd
+DAS IST EIN TEST!!!
+=======
+# game-project
+>>>>>>> theirs
