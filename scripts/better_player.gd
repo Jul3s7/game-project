@@ -12,6 +12,8 @@ extends CharacterBody2D
 var face_direction := 1
 var x_dir := 1
 
+@onready var sprite = $AnimatedSprite2D
+
 @export var max_speed: float = 560
 @export var acceleration: float = 2880
 @export var turning_acceleration : float = 9600
@@ -46,26 +48,35 @@ func get_input() -> Dictionary:
 		"y": int(Input.is_action_pressed("p1_down")) - int(Input.is_action_pressed("p1_up")),
 		"just_jump": Input.is_action_just_pressed("p1_jump") == true,
 		"jump": Input.is_action_pressed("p1_jump") == true,
-		"released_jump": Input.is_action_just_released("p1_jump") == true
+		"released_jump": Input.is_action_just_released("p1_jump") == true,
+		"attack": Input.is_action_just_pressed("p1_attack") == true
 	}
 
 
-func _physics_process(delta: float) -> void:
-	animations()
-	
+func _physics_process(delta: float) -> void:	
 	x_movement(delta)
 	jump_logic(delta)
 	apply_gravity(delta)
 	
+	animations()
+	
 	timers(delta)
 	move_and_slide()
 
-func animations() -> void:
-	if x_dir > 0:
-		$AnimatedSprite2D.flip_h = false
-	elif x_dir <= 0:
-		$AnimatedSprite2D.flip_h = true
 
+
+func animations():
+	if get_input()["attack"]:
+		sprite.play("attack")
+	
+	if sprite.get_animation() == "attack":
+		if sprite.frame_progress == 1:
+			sprite.play("idle")
+	else:
+		if x_dir == 0:
+			sprite.play("idle")
+		else:
+			sprite.play("run")
 
 
 func x_movement(delta: float) -> void:
@@ -90,7 +101,7 @@ func x_movement(delta: float) -> void:
 	velocity.x += x_dir * accel_rate * delta
 	
 	set_direction(x_dir) # This is purely for visuals
-
+	
 
 func set_direction(hor_direction) -> void:
 	# This is purely for visuals
